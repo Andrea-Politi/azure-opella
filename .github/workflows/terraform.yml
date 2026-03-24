@@ -100,7 +100,42 @@ jobs:
         run: exit 1
 
   # ------------------------------------------------------------------
-  # Stage 2: Security scan (runs on every PR)
+  # Stage 2: Module tests (runs on every PR)
+  # ------------------------------------------------------------------
+  test:
+    name: "Module tests"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Test VNET module
+        working-directory: modules/vnet
+        run: |
+          terraform init -backend=false
+          terraform test
+
+  # ------------------------------------------------------------------
+  # Stage 3: Documentation check (runs on every PR)
+  # ------------------------------------------------------------------
+  docs:
+    name: "Check terraform-docs"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: terraform-docs/gh-actions@v1
+        with:
+          find-dir: modules/
+          fail-on-diff: true
+
+  # ------------------------------------------------------------------
+  # Stage 4: Security scan (runs on every PR)
   # ------------------------------------------------------------------
   security:
     name: "Security scan"
@@ -119,7 +154,7 @@ jobs:
           output_format: cli
 
   # ------------------------------------------------------------------
-  # Stage 3: Apply dev (runs on merge to main)
+  # Stage 5: Apply dev (runs on merge to main)
   # ------------------------------------------------------------------
   apply-dev:
     name: "Apply - dev"
@@ -146,7 +181,7 @@ jobs:
         run: terraform apply -input=false tfplan
 
   # ------------------------------------------------------------------
-  # Stage 4: Apply prod (runs on merge to main, requires approval)
+  # Stage 6: Apply prod (runs on merge to main, requires approval)
   # ------------------------------------------------------------------
   apply-prod:
     name: "Apply - prod"

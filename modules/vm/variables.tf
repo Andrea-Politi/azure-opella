@@ -58,7 +58,15 @@ variable "zone" {
 }
 
 variable "tags" {
-  description = "Tags to apply to all resources"
+  description = "Tags to apply to all resources. Must include 'environment', 'project', and 'managed_by'."
   type        = map(string)
-  default     = {}
+
+  validation {
+    condition = alltrue([
+      contains(keys(var.tags), "environment"),
+      contains(keys(var.tags), "project"),
+      contains(keys(var.tags), "managed_by"),
+    ])
+    error_message = "Tags must include 'environment', 'project', and 'managed_by' keys."
+  }
 }
