@@ -1,0 +1,212 @@
+name: Terraform
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  TF_VERSION: "1.9.0"
+
+jobs:
+  # ------------------------------------------------------------------
+  # Stage 1: Validate (runs on every PR)
+  # ------------------------------------------------------------------
+  validate:
+    name: "Validate - ${{ matrix.environment }}"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [dev, prod]
+    defaults:
+      run:
+        working-directory: environments/${{ matrix.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Use example tfvars
+        run: cp terraform.tfvars.example terraform.tfvars
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check -recursive ../..
+        continue-on-error: true
+
+      - name: Terraform init
+        id: init
+        run: terraform init -input=false
+
+      - name: Terraform validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform plan
+        id: plan
+        run: terraform plan -var-file=terraform.tfvars -no-color -input=false
+        continue-on-error: true
+
+      - name: Post plan to PR
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const env = '${{ matrix.environment }}';
+            const plan = `${{ steps.plan.outputs.stdout }}`;
+            const planError = `${{ steps.plan.outputs.stderr }}`;
+            const truncated = plan.length > 60000
+              ? plan.substring(0, 60000) + '\n\n... (truncated)'
+              : plan;
+
+            const body = `### Terraform Plan - \`${env}\`
+
+            | Step | Result |
+            |------|--------|
+            | Format | \`${{ steps.fmt.outcome }}\` |
+            | Init | \`${{ steps.init.outcome }}\` |
+            | Validate | \`${{ steps.validate.outcome }}\` |
+            | Plan | \`${{ steps.plan.outcome }}\` |
+
+            <details><summary>Show plan</summary>
+
+            \`\`\`terraform
+            ${truncated}
+            \`\`\`
+
+            </details>
+
+            *Triggered by @${{ github.actor }} on \`${{ github.event.pull_request.head.ref }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Fail on plan error
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+  # ------------------------------------------------------------------
+  # Stage 2: Module tests (runs on every PR)
+  # ------------------------------------------------------------------
+  test:
+    name: "Module tests"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Test VNET module
+        working-directory: modules/vnet
+        run: |
+          terraform init -backend=false
+          terraform test
+
+  # ------------------------------------------------------------------
+  # Stage 3: Documentation check (runs on every PR)
+  # ------------------------------------------------------------------
+  docs:
+    name: "Check terraform-docs"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: terraform-docs/gh-actions@v1
+        with:
+          find-dir: modules/
+          fail-on-diff: true
+
+  # ------------------------------------------------------------------
+  # Stage 4: Security scan (runs on every PR)
+  # ------------------------------------------------------------------
+  security:
+    name: "Security scan"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: .
+          framework: terraform
+          quiet: true
+          soft_fail: true
+          output_format: cli
+
+  # ------------------------------------------------------------------
+  # Stage 5: Apply dev (runs on merge to main)
+  # ------------------------------------------------------------------
+  apply-dev:
+    name: "Apply - dev"
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: dev
+    defaults:
+      run:
+        working-directory: environments/dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform plan
+        run: terraform plan -var-file=terraform.tfvars -out=tfplan -input=false
+
+      - name: Terraform apply
+        run: terraform apply -input=false tfplan
+
+  # ------------------------------------------------------------------
+  # Stage 6: Apply prod (runs on merge to main, requires approval)
+  # ------------------------------------------------------------------
+  apply-prod:
+    name: "Apply - prod"
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: apply-dev
+    environment: production
+    defaults:
+      run:
+        working-directory: environments/prod
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform plan
+        run: terraform plan -var-file=terraform.tfvars -out=tfplan -input=false
+
+      - name: Terraform apply
+        run: terraform apply -input=false tfplan
