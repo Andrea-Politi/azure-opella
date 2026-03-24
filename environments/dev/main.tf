@@ -51,7 +51,7 @@ module "keyvault" {
   resource_group_name = azurerm_resource_group.main.name
   location            = var.location
   tenant_id           = data.azurerm_client_config.current.tenant_id
-  admin_object_id     = data.azurerm_client_config.current.object_id
+  admin_object_ids    = [data.azurerm_client_config.current.object_id]
   tags                = local.common_tags
 }
 

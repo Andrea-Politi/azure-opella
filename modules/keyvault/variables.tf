@@ -18,9 +18,9 @@ variable "tenant_id" {
   type        = string
 }
 
-variable "admin_object_id" {
-  description = "Object ID of the principal for full secret access"
-  type        = string
+variable "admin_object_ids" {
+  description = "List of object IDs for principals with full secret access"
+  type        = list(string)
 }
 
 variable "tags" {

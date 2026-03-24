@@ -33,7 +33,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_admin_object_id"></a> [admin\_object\_id](#input\_admin\_object\_id) | Object ID of the principal for full secret access | `string` | n/a | yes |
+| <a name="input_admin_object_ids"></a> [admin\_object\_ids](#input\_admin\_object\_ids) | List of object IDs for principals with full secret access | `list(string)` | n/a | yes |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Name of the Key Vault (globally unique, max 24 chars) | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |

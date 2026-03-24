@@ -7,18 +7,21 @@ resource "azurerm_key_vault" "this" {
   rbac_authorization_enabled = false
   purge_protection_enabled   = false
 
-  access_policy {
-    tenant_id = var.tenant_id
-    object_id = var.admin_object_id
+  dynamic "access_policy" {
+    for_each = var.admin_object_ids
+    content {
+      tenant_id = var.tenant_id
+      object_id = access_policy.value
 
-    secret_permissions = [
-      "Get",
-      "List",
-      "Set",
-      "Delete",
-      "Purge",
-      "Recover",
-    ]
+      secret_permissions = [
+        "Get",
+        "List",
+        "Set",
+        "Delete",
+        "Purge",
+        "Recover",
+      ]
+    }
   }
 
   tags = var.tags
