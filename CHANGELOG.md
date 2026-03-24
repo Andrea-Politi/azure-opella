@@ -72,8 +72,38 @@ All notable activities and decisions for this project are documented here.
 - **Apply prod** (merge to main): requires manual approval via GitHub `production` environment protection rules
 - Prod deploy depends on successful dev deploy (sequential gating)
 
-### Next Steps
-- Configure GitHub environment protection rules for `production`
-- Set GitHub secrets: `ARM_CLIENT_ID`, `ARM_CLIENT_SECRET`, `ARM_SUBSCRIPTION_ID`, `ARM_TENANT_ID`
-- Resolve VM capacity restriction (Azure support request)
-- Prod environment tfvars configuration
+### Automated Documentation (`terraform-docs`)
+- Added `.terraform-docs.yml` root config (markdown table, inject mode)
+- Auto-generated README.md for all 5 modules (vnet, bastion, vm, acr, keyvault)
+- CI job (`Check terraform-docs`) fails PR if docs are stale
+- Docs include: providers, resources, inputs (sorted by required), outputs
+
+### Module Tests (`terraform test`)
+- 8 plan-only tests for the VNET module using `mock_provider` (no Azure credentials needed)
+- Tests cover: VNET creation, subnet count, NSG naming, NAT Gateway toggle, route tables, tag propagation
+- CI job (`Module tests`) runs on every PR
+
+### Tag Enforcement
+- All 5 modules enforce required tags (`environment`, `project`, `managed_by`) via `validation` blocks
+- Fails at `terraform plan` time with a clear error message
+- Chosen over Azure Policy for simplicity and earlier feedback
+
+### Key Vault — Multi-Principal Access
+- Changed `admin_object_id` (string) to `admin_object_ids` (list) with `dynamic` access_policy block
+- Supports both local CLI identity and CI service principal accessing the same Key Vault
+- Manually added CI service principal to existing Key Vault to resolve chicken-and-egg bootstrap issue
+
+### CI Pipeline — Final Configuration
+- **6 stages**: validate (matrix), module tests, terraform-docs check, security scan, apply dev, apply prod
+- CI copies `terraform.tfvars.example` → `terraform.tfvars` (no secrets in tfvars files)
+- GitHub repository secrets configured: `ARM_CLIENT_ID`, `ARM_CLIENT_SECRET`, `ARM_SUBSCRIPTION_ID`, `ARM_TENANT_ID`
+- All checks passing on PR
+
+### Documentation
+- `docs/design-decisions.md`: RG vs subscriptions argument, tag enforcement rationale, Bastion vs jump box
+- `docs/release-lifecycle.md`: full pipeline flow with diagram (PR → validate → merge → apply dev → approval → apply prod)
+- `docs/tooling.md`: all tools (fmt, validate, test, checkov, terraform-docs, tflint), local dev commands
+- `docs/plan-outputs/`: bootstrap and full dev plan outputs (63 resources) as required by challenge
+
+### Known Issues
+- **VM creation blocked** — Azure free-tier subscription has capacity restrictions on all VM SKUs across all tested regions. Terraform code is correct; requires Azure support request to lift restriction.
