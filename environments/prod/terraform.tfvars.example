@@ -1,0 +1,21 @@
+environment = "prod"
+location    = "eastus"
+project     = "opella"
+
+primary_vnet_cidr   = "10.10.0.0/16"
+secondary_vnet_cidr = "10.255.0.0/16"
+
+primary_subnets = [
+  { name = "snet-private-1", address_prefixes = ["10.10.1.0/24"], type = "private" },
+  { name = "snet-private-2", address_prefixes = ["10.10.2.0/24"], type = "private" },
+  { name = "snet-private-3", address_prefixes = ["10.10.3.0/24"], type = "private" },
+  { name = "snet-public-1", address_prefixes = ["10.10.101.0/24"], type = "public" },
+  { name = "snet-public-2", address_prefixes = ["10.10.102.0/24"], type = "public" },
+  { name = "snet-public-3", address_prefixes = ["10.10.103.0/24"], type = "public" },
+]
+
+secondary_subnets = [
+  { name = "snet-private-1", address_prefixes = ["10.255.1.0/24"], type = "private" },
+  { name = "snet-private-2", address_prefixes = ["10.255.2.0/24"], type = "private" },
+  { name = "snet-private-3", address_prefixes = ["10.255.3.0/24"], type = "private" },
+]
