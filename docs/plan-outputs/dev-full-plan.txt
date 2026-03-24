@@ -1,0 +1,1236 @@
+Acquiring state lock. This may take a few moments...
+data.azurerm_client_config.current: Reading...
+data.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD0wNGIwNzc5NS04ZGRiLTQ2MWEtYmJlZS0wMmY5ZTFiZjdiNDY7b2JqZWN0SWQ9NGMzOGNlY2YtNjI3OS00MGMzLWFiMmMtMmI1OTUxNTM1NWE0O3N1YnNjcmlwdGlvbklkPTI2YjM2ZWNhLTQxYTYtNDZhOS1hMTFmLWEwNzFkZDhmNjBhYTt0ZW5hbnRJZD00Y2RiYmM2Mi1jYjU5LTRkYmQtOThkZS01NDlmMzRjY2JiZjk=]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # azurerm_resource_group.main will be created
+  + resource "azurerm_resource_group" "main" {
+      + id       = (known after apply)
+      + location = "eastus2"
+      + name     = "rg-opella-dev-eastus2"
+      + tags     = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.acr.azurerm_container_registry.this will be created
+  + resource "azurerm_container_registry" "this" {
+      + admin_enabled                 = true
+      + admin_password                = (sensitive value)
+      + admin_username                = (known after apply)
+      + data_endpoint_host_names      = (known after apply)
+      + encryption                    = (known after apply)
+      + export_policy_enabled         = true
+      + id                            = (known after apply)
+      + location                      = "eastus2"
+      + login_server                  = (known after apply)
+      + name                          = "acropelladev"
+      + network_rule_bypass_option    = "AzureServices"
+      + network_rule_set              = (known after apply)
+      + public_network_access_enabled = true
+      + resource_group_name           = "rg-opella-dev-eastus2"
+      + sku                           = "Basic"
+      + tags                          = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+      + trust_policy_enabled          = false
+      + zone_redundancy_enabled       = false
+    }
+
+  # module.acr.azurerm_key_vault_secret.acr_admin_password[0] will be created
+  + resource "azurerm_key_vault_secret" "acr_admin_password" {
+      + id                      = (known after apply)
+      + key_vault_id            = (known after apply)
+      + name                    = "acropelladev-admin-password"
+      + resource_id             = (known after apply)
+      + resource_versionless_id = (known after apply)
+      + value                   = (sensitive value)
+      + value_wo                = (write-only attribute)
+      + version                 = (known after apply)
+      + versionless_id          = (known after apply)
+    }
+
+  # module.acr.azurerm_key_vault_secret.acr_admin_username[0] will be created
+  + resource "azurerm_key_vault_secret" "acr_admin_username" {
+      + id                      = (known after apply)
+      + key_vault_id            = (known after apply)
+      + name                    = "acropelladev-admin-username"
+      + resource_id             = (known after apply)
+      + resource_versionless_id = (known after apply)
+      + value                   = (sensitive value)
+      + value_wo                = (write-only attribute)
+      + version                 = (known after apply)
+      + versionless_id          = (known after apply)
+    }
+
+  # module.bastion.azurerm_bastion_host.this will be created
+  + resource "azurerm_bastion_host" "this" {
+      + copy_paste_enabled        = true
+      + dns_name                  = (known after apply)
+      + file_copy_enabled         = false
+      + id                        = (known after apply)
+      + ip_connect_enabled        = false
+      + kerberos_enabled          = false
+      + location                  = "eastus2"
+      + name                      = "bas-opella-dev-eastus2"
+      + resource_group_name       = "rg-opella-dev-eastus2"
+      + scale_units               = 2
+      + session_recording_enabled = false
+      + shareable_link_enabled    = false
+      + sku                       = "Basic"
+      + tags                      = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+      + tunneling_enabled         = false
+
+      + ip_configuration {
+          + name                 = "bastion-ip-config"
+          + public_ip_address_id = (known after apply)
+          + subnet_id            = (known after apply)
+        }
+    }
+
+  # module.bastion.azurerm_network_security_group.bastion will be created
+  + resource "azurerm_network_security_group" "bastion" {
+      + id                  = (known after apply)
+      + location            = "eastus2"
+      + name                = "bas-opella-dev-eastus2-nsg"
+      + resource_group_name = "rg-opella-dev-eastus2"
+      + security_rule       = [
+          + {
+              + access                                     = "Allow"
+              + destination_address_prefix                 = "*"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "443"
+              + destination_port_ranges                    = []
+              + direction                                  = "Inbound"
+              + name                                       = "Allow-AzureLoadBalancer-Inbound"
+              + priority                                   = 120
+              + protocol                                   = "Tcp"
+              + source_address_prefix                      = "AzureLoadBalancer"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+          + {
+              + access                                     = "Allow"
+              + destination_address_prefix                 = "*"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "443"
+              + destination_port_ranges                    = []
+              + direction                                  = "Inbound"
+              + name                                       = "Allow-GatewayManager-Inbound"
+              + priority                                   = 110
+              + protocol                                   = "Tcp"
+              + source_address_prefix                      = "GatewayManager"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+          + {
+              + access                                     = "Allow"
+              + destination_address_prefix                 = "*"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "443"
+              + destination_port_ranges                    = []
+              + direction                                  = "Inbound"
+              + name                                       = "Allow-HTTPS-Inbound"
+              + priority                                   = 100
+              + protocol                                   = "Tcp"
+              + source_address_prefix                      = "Internet"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+          + {
+              + access                                     = "Allow"
+              + destination_address_prefix                 = "AzureCloud"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "443"
+              + destination_port_ranges                    = []
+              + direction                                  = "Outbound"
+              + name                                       = "Allow-AzureCloud-Outbound"
+              + priority                                   = 110
+              + protocol                                   = "Tcp"
+              + source_address_prefix                      = "*"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+          + {
+              + access                                     = "Allow"
+              + destination_address_prefix                 = "VirtualNetwork"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_ranges                    = [
+                  + "22",
+                  + "3389",
+                ]
+              + direction                                  = "Outbound"
+              + name                                       = "Allow-SSH-RDP-Outbound"
+              + priority                                   = 100
+              + protocol                                   = "Tcp"
+              + source_address_prefix                      = "*"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (2 unchanged attributes hidden)
+            },
+          + {
+              + access                                     = "Allow"
+              + destination_address_prefix                 = "VirtualNetwork"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_ranges                    = [
+                  + "5701",
+                  + "8080",
+                ]
+              + direction                                  = "Inbound"
+              + name                                       = "Allow-BastionHostCommunication-Inbound"
+              + priority                                   = 130
+              + protocol                                   = "*"
+              + source_address_prefix                      = "VirtualNetwork"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (2 unchanged attributes hidden)
+            },
+          + {
+              + access                                     = "Allow"
+              + destination_address_prefix                 = "VirtualNetwork"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_ranges                    = [
+                  + "5701",
+                  + "8080",
+                ]
+              + direction                                  = "Outbound"
+              + name                                       = "Allow-BastionHostCommunication-Outbound"
+              + priority                                   = 120
+              + protocol                                   = "*"
+              + source_address_prefix                      = "VirtualNetwork"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (2 unchanged attributes hidden)
+            },
+          + {
+              + access                                     = "Deny"
+              + destination_address_prefix                 = "*"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "*"
+              + destination_port_ranges                    = []
+              + direction                                  = "Inbound"
+              + name                                       = "Deny-All-Inbound"
+              + priority                                   = 4096
+              + protocol                                   = "*"
+              + source_address_prefix                      = "*"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+        ]
+      + tags                = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.bastion.azurerm_public_ip.bastion will be created
+  + resource "azurerm_public_ip" "bastion" {
+      + allocation_method       = "Static"
+      + ddos_protection_mode    = "VirtualNetworkInherited"
+      + fqdn                    = (known after apply)
+      + id                      = (known after apply)
+      + idle_timeout_in_minutes = 4
+      + ip_address              = (known after apply)
+      + ip_version              = "IPv4"
+      + location                = "eastus2"
+      + name                    = "bas-opella-dev-eastus2-pip"
+      + resource_group_name     = "rg-opella-dev-eastus2"
+      + sku                     = "Standard"
+      + sku_tier                = "Regional"
+      + tags                    = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.bastion.azurerm_subnet.bastion will be created
+  + resource "azurerm_subnet" "bastion" {
+      + address_prefixes                              = [
+          + "10.10.200.0/26",
+        ]
+      + default_outbound_access_enabled               = true
+      + id                                            = (known after apply)
+      + name                                          = "AzureBastionSubnet"
+      + private_endpoint_network_policies             = "Disabled"
+      + private_link_service_network_policies_enabled = true
+      + resource_group_name                           = "rg-opella-dev-eastus2"
+      + virtual_network_name                          = "vnet-primary-opella-dev-eastus2"
+    }
+
+  # module.bastion.azurerm_subnet_network_security_group_association.bastion will be created
+  + resource "azurerm_subnet_network_security_group_association" "bastion" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.keyvault.azurerm_key_vault.this will be created
+  + resource "azurerm_key_vault" "this" {
+      + access_policy                 = [
+          + {
+              + object_id          = "4c38cecf-6279-40c3-ab2c-2b59515355a4"
+              + secret_permissions = [
+                  + "Get",
+                  + "List",
+                  + "Set",
+                  + "Delete",
+                  + "Purge",
+                  + "Recover",
+                ]
+              + tenant_id          = "4cdbbc62-cb59-4dbd-98de-549f34ccbbf9"
+            },
+        ]
+      + enable_rbac_authorization     = (known after apply)
+      + id                            = (known after apply)
+      + location                      = "eastus2"
+      + name                          = "kv-opella-dev-eastus2"
+      + public_network_access_enabled = true
+      + purge_protection_enabled      = false
+      + rbac_authorization_enabled    = false
+      + resource_group_name           = "rg-opella-dev-eastus2"
+      + sku_name                      = "standard"
+      + soft_delete_retention_days    = 90
+      + tags                          = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+      + tenant_id                     = "4cdbbc62-cb59-4dbd-98de-549f34ccbbf9"
+      + vault_uri                     = (known after apply)
+
+      + contact (known after apply)
+
+      + network_acls (known after apply)
+    }
+
+  # module.vm.azurerm_key_vault_secret.ssh_private_key will be created
+  + resource "azurerm_key_vault_secret" "ssh_private_key" {
+      + id                      = (known after apply)
+      + key_vault_id            = (known after apply)
+      + name                    = "vm-dev-opella-dev-eastus2-ssh-private-key"
+      + resource_id             = (known after apply)
+      + resource_versionless_id = (known after apply)
+      + value                   = (sensitive value)
+      + value_wo                = (write-only attribute)
+      + version                 = (known after apply)
+      + versionless_id          = (known after apply)
+    }
+
+  # module.vm.azurerm_linux_virtual_machine.this will be created
+  + resource "azurerm_linux_virtual_machine" "this" {
+      + admin_username                                         = "azureuser"
+      + allow_extension_operations                             = (known after apply)
+      + bypass_platform_safety_checks_on_user_schedule_enabled = false
+      + computer_name                                          = (known after apply)
+      + disable_password_authentication                        = true
+      + disk_controller_type                                   = (known after apply)
+      + extensions_time_budget                                 = "PT1H30M"
+      + id                                                     = (known after apply)
+      + location                                               = "eastus2"
+      + max_bid_price                                          = -1
+      + name                                                   = "vm-dev-opella-dev-eastus2"
+      + network_interface_ids                                  = (known after apply)
+      + os_managed_disk_id                                     = (known after apply)
+      + patch_assessment_mode                                  = (known after apply)
+      + patch_mode                                             = (known after apply)
+      + platform_fault_domain                                  = -1
+      + priority                                               = "Regular"
+      + private_ip_address                                     = (known after apply)
+      + private_ip_addresses                                   = (known after apply)
+      + provision_vm_agent                                     = (known after apply)
+      + public_ip_address                                      = (known after apply)
+      + public_ip_addresses                                    = (known after apply)
+      + resource_group_name                                    = "rg-opella-dev-eastus2"
+      + size                                                   = "Standard_B1s"
+      + tags                                                   = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+      + virtual_machine_id                                     = (known after apply)
+      + vm_agent_platform_updates_enabled                      = (known after apply)
+      + zone                                                   = "1"
+
+      + admin_ssh_key {
+          + public_key = (known after apply)
+          + username   = "azureuser"
+        }
+
+      + os_disk {
+          + caching                   = "ReadWrite"
+          + disk_size_gb              = (known after apply)
+          + id                        = (known after apply)
+          + name                      = (known after apply)
+          + storage_account_type      = "Standard_LRS"
+          + write_accelerator_enabled = false
+        }
+
+      + source_image_reference {
+          + offer     = "0001-com-ubuntu-server-jammy"
+          + publisher = "Canonical"
+          + sku       = "22_04-lts-gen2"
+          + version   = "latest"
+        }
+
+      + termination_notification (known after apply)
+    }
+
+  # module.vm.azurerm_network_interface.this will be created
+  + resource "azurerm_network_interface" "this" {
+      + accelerated_networking_enabled = false
+      + applied_dns_servers            = (known after apply)
+      + id                             = (known after apply)
+      + internal_domain_name_suffix    = (known after apply)
+      + ip_forwarding_enabled          = false
+      + location                       = "eastus2"
+      + mac_address                    = (known after apply)
+      + name                           = "vm-dev-opella-dev-eastus2-nic"
+      + private_ip_address             = (known after apply)
+      + private_ip_addresses           = (known after apply)
+      + resource_group_name            = "rg-opella-dev-eastus2"
+      + tags                           = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+      + virtual_machine_id             = (known after apply)
+
+      + ip_configuration {
+          + gateway_load_balancer_frontend_ip_configuration_id = (known after apply)
+          + name                                               = "internal"
+          + primary                                            = (known after apply)
+          + private_ip_address                                 = (known after apply)
+          + private_ip_address_allocation                      = "Dynamic"
+          + private_ip_address_version                         = "IPv4"
+          + subnet_id                                          = (known after apply)
+        }
+    }
+
+  # module.vm.tls_private_key.ssh will be created
+  + resource "tls_private_key" "ssh" {
+      + algorithm                     = "RSA"
+      + ecdsa_curve                   = "P224"
+      + id                            = (known after apply)
+      + private_key_openssh           = (sensitive value)
+      + private_key_pem               = (sensitive value)
+      + private_key_pem_pkcs8         = (sensitive value)
+      + public_key_fingerprint_md5    = (known after apply)
+      + public_key_fingerprint_sha256 = (known after apply)
+      + public_key_openssh            = (known after apply)
+      + public_key_pem                = (known after apply)
+      + rsa_bits                      = 4096
+    }
+
+  # module.vnet_primary.azurerm_nat_gateway.this[0] will be created
+  + resource "azurerm_nat_gateway" "this" {
+      + id                      = (known after apply)
+      + idle_timeout_in_minutes = 4
+      + location                = "eastus2"
+      + name                    = "vnet-primary-opella-dev-eastus2-natgw"
+      + resource_group_name     = "rg-opella-dev-eastus2"
+      + resource_guid           = (known after apply)
+      + sku_name                = "Standard"
+      + tags                    = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.vnet_primary.azurerm_nat_gateway_public_ip_association.this[0] will be created
+  + resource "azurerm_nat_gateway_public_ip_association" "this" {
+      + id                   = (known after apply)
+      + nat_gateway_id       = (known after apply)
+      + public_ip_address_id = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_network_security_group.private will be created
+  + resource "azurerm_network_security_group" "private" {
+      + id                  = (known after apply)
+      + location            = "eastus2"
+      + name                = "vnet-primary-opella-dev-eastus2-nsg-private"
+      + resource_group_name = "rg-opella-dev-eastus2"
+      + security_rule       = [
+          + {
+              + access                                     = "Allow"
+              + destination_address_prefix                 = "VirtualNetwork"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "*"
+              + destination_port_ranges                    = []
+              + direction                                  = "Inbound"
+              + name                                       = "Allow-VNet-Inbound"
+              + priority                                   = 100
+              + protocol                                   = "*"
+              + source_address_prefix                      = "VirtualNetwork"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+          + {
+              + access                                     = "Deny"
+              + destination_address_prefix                 = "*"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "*"
+              + destination_port_ranges                    = []
+              + direction                                  = "Inbound"
+              + name                                       = "Deny-All-Inbound"
+              + priority                                   = 4096
+              + protocol                                   = "*"
+              + source_address_prefix                      = "*"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+        ]
+      + tags                = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.vnet_primary.azurerm_network_security_group.public will be created
+  + resource "azurerm_network_security_group" "public" {
+      + id                  = (known after apply)
+      + location            = "eastus2"
+      + name                = "vnet-primary-opella-dev-eastus2-nsg-public"
+      + resource_group_name = "rg-opella-dev-eastus2"
+      + security_rule       = [
+          + {
+              + access                                     = "Allow"
+              + destination_address_prefix                 = "*"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "443"
+              + destination_port_ranges                    = []
+              + direction                                  = "Inbound"
+              + name                                       = "Allow-HTTPS-Inbound"
+              + priority                                   = 110
+              + protocol                                   = "Tcp"
+              + source_address_prefix                      = "*"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+          + {
+              + access                                     = "Allow"
+              + destination_address_prefix                 = "*"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "80"
+              + destination_port_ranges                    = []
+              + direction                                  = "Inbound"
+              + name                                       = "Allow-HTTP-Inbound"
+              + priority                                   = 100
+              + protocol                                   = "Tcp"
+              + source_address_prefix                      = "*"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+          + {
+              + access                                     = "Deny"
+              + destination_address_prefix                 = "*"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "*"
+              + destination_port_ranges                    = []
+              + direction                                  = "Inbound"
+              + name                                       = "Deny-All-Inbound"
+              + priority                                   = 4096
+              + protocol                                   = "*"
+              + source_address_prefix                      = "*"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+        ]
+      + tags                = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.vnet_primary.azurerm_public_ip.nat[0] will be created
+  + resource "azurerm_public_ip" "nat" {
+      + allocation_method       = "Static"
+      + ddos_protection_mode    = "VirtualNetworkInherited"
+      + fqdn                    = (known after apply)
+      + id                      = (known after apply)
+      + idle_timeout_in_minutes = 4
+      + ip_address              = (known after apply)
+      + ip_version              = "IPv4"
+      + location                = "eastus2"
+      + name                    = "vnet-primary-opella-dev-eastus2-nat-pip"
+      + resource_group_name     = "rg-opella-dev-eastus2"
+      + sku                     = "Standard"
+      + sku_tier                = "Regional"
+      + tags                    = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.vnet_primary.azurerm_route_table.private[0] will be created
+  + resource "azurerm_route_table" "private" {
+      + bgp_route_propagation_enabled = false
+      + id                            = (known after apply)
+      + location                      = "eastus2"
+      + name                          = "vnet-primary-opella-dev-eastus2-rt-private"
+      + resource_group_name           = "rg-opella-dev-eastus2"
+      + route                         = (known after apply)
+      + subnets                       = (known after apply)
+      + tags                          = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.vnet_primary.azurerm_route_table.public[0] will be created
+  + resource "azurerm_route_table" "public" {
+      + bgp_route_propagation_enabled = true
+      + id                            = (known after apply)
+      + location                      = "eastus2"
+      + name                          = "vnet-primary-opella-dev-eastus2-rt-public"
+      + resource_group_name           = "rg-opella-dev-eastus2"
+      + route                         = (known after apply)
+      + subnets                       = (known after apply)
+      + tags                          = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.vnet_primary.azurerm_subnet.this["snet-private-1"] will be created
+  + resource "azurerm_subnet" "this" {
+      + address_prefixes                              = [
+          + "10.10.1.0/24",
+        ]
+      + default_outbound_access_enabled               = true
+      + id                                            = (known after apply)
+      + name                                          = "snet-private-1"
+      + private_endpoint_network_policies             = "Disabled"
+      + private_link_service_network_policies_enabled = true
+      + resource_group_name                           = "rg-opella-dev-eastus2"
+      + virtual_network_name                          = "vnet-primary-opella-dev-eastus2"
+    }
+
+  # module.vnet_primary.azurerm_subnet.this["snet-private-2"] will be created
+  + resource "azurerm_subnet" "this" {
+      + address_prefixes                              = [
+          + "10.10.2.0/24",
+        ]
+      + default_outbound_access_enabled               = true
+      + id                                            = (known after apply)
+      + name                                          = "snet-private-2"
+      + private_endpoint_network_policies             = "Disabled"
+      + private_link_service_network_policies_enabled = true
+      + resource_group_name                           = "rg-opella-dev-eastus2"
+      + virtual_network_name                          = "vnet-primary-opella-dev-eastus2"
+    }
+
+  # module.vnet_primary.azurerm_subnet.this["snet-private-3"] will be created
+  + resource "azurerm_subnet" "this" {
+      + address_prefixes                              = [
+          + "10.10.3.0/24",
+        ]
+      + default_outbound_access_enabled               = true
+      + id                                            = (known after apply)
+      + name                                          = "snet-private-3"
+      + private_endpoint_network_policies             = "Disabled"
+      + private_link_service_network_policies_enabled = true
+      + resource_group_name                           = "rg-opella-dev-eastus2"
+      + virtual_network_name                          = "vnet-primary-opella-dev-eastus2"
+    }
+
+  # module.vnet_primary.azurerm_subnet.this["snet-public-1"] will be created
+  + resource "azurerm_subnet" "this" {
+      + address_prefixes                              = [
+          + "10.10.101.0/24",
+        ]
+      + default_outbound_access_enabled               = true
+      + id                                            = (known after apply)
+      + name                                          = "snet-public-1"
+      + private_endpoint_network_policies             = "Disabled"
+      + private_link_service_network_policies_enabled = true
+      + resource_group_name                           = "rg-opella-dev-eastus2"
+      + virtual_network_name                          = "vnet-primary-opella-dev-eastus2"
+    }
+
+  # module.vnet_primary.azurerm_subnet.this["snet-public-2"] will be created
+  + resource "azurerm_subnet" "this" {
+      + address_prefixes                              = [
+          + "10.10.102.0/24",
+        ]
+      + default_outbound_access_enabled               = true
+      + id                                            = (known after apply)
+      + name                                          = "snet-public-2"
+      + private_endpoint_network_policies             = "Disabled"
+      + private_link_service_network_policies_enabled = true
+      + resource_group_name                           = "rg-opella-dev-eastus2"
+      + virtual_network_name                          = "vnet-primary-opella-dev-eastus2"
+    }
+
+  # module.vnet_primary.azurerm_subnet.this["snet-public-3"] will be created
+  + resource "azurerm_subnet" "this" {
+      + address_prefixes                              = [
+          + "10.10.103.0/24",
+        ]
+      + default_outbound_access_enabled               = true
+      + id                                            = (known after apply)
+      + name                                          = "snet-public-3"
+      + private_endpoint_network_policies             = "Disabled"
+      + private_link_service_network_policies_enabled = true
+      + resource_group_name                           = "rg-opella-dev-eastus2"
+      + virtual_network_name                          = "vnet-primary-opella-dev-eastus2"
+    }
+
+  # module.vnet_primary.azurerm_subnet_nat_gateway_association.private["snet-private-1"] will be created
+  + resource "azurerm_subnet_nat_gateway_association" "private" {
+      + id             = (known after apply)
+      + nat_gateway_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_subnet_nat_gateway_association.private["snet-private-2"] will be created
+  + resource "azurerm_subnet_nat_gateway_association" "private" {
+      + id             = (known after apply)
+      + nat_gateway_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_subnet_nat_gateway_association.private["snet-private-3"] will be created
+  + resource "azurerm_subnet_nat_gateway_association" "private" {
+      + id             = (known after apply)
+      + nat_gateway_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_subnet_network_security_group_association.private["snet-private-1"] will be created
+  + resource "azurerm_subnet_network_security_group_association" "private" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_subnet_network_security_group_association.private["snet-private-2"] will be created
+  + resource "azurerm_subnet_network_security_group_association" "private" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_subnet_network_security_group_association.private["snet-private-3"] will be created
+  + resource "azurerm_subnet_network_security_group_association" "private" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_subnet_network_security_group_association.public["snet-public-1"] will be created
+  + resource "azurerm_subnet_network_security_group_association" "public" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_subnet_network_security_group_association.public["snet-public-2"] will be created
+  + resource "azurerm_subnet_network_security_group_association" "public" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_subnet_network_security_group_association.public["snet-public-3"] will be created
+  + resource "azurerm_subnet_network_security_group_association" "public" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_subnet_route_table_association.private["snet-private-1"] will be created
+  + resource "azurerm_subnet_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_subnet_route_table_association.private["snet-private-2"] will be created
+  + resource "azurerm_subnet_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_subnet_route_table_association.private["snet-private-3"] will be created
+  + resource "azurerm_subnet_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_subnet_route_table_association.public["snet-public-1"] will be created
+  + resource "azurerm_subnet_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_subnet_route_table_association.public["snet-public-2"] will be created
+  + resource "azurerm_subnet_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_subnet_route_table_association.public["snet-public-3"] will be created
+  + resource "azurerm_subnet_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_primary.azurerm_virtual_network.this will be created
+  + resource "azurerm_virtual_network" "this" {
+      + address_space                  = [
+          + "10.10.0.0/16",
+        ]
+      + dns_servers                    = (known after apply)
+      + guid                           = (known after apply)
+      + id                             = (known after apply)
+      + location                       = "eastus2"
+      + name                           = "vnet-primary-opella-dev-eastus2"
+      + private_endpoint_vnet_policies = "Disabled"
+      + resource_group_name            = "rg-opella-dev-eastus2"
+      + subnet                         = (known after apply)
+      + tags                           = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.vnet_secondary.azurerm_nat_gateway.this[0] will be created
+  + resource "azurerm_nat_gateway" "this" {
+      + id                      = (known after apply)
+      + idle_timeout_in_minutes = 4
+      + location                = "eastus2"
+      + name                    = "vnet-secondary-opella-dev-eastus2-natgw"
+      + resource_group_name     = "rg-opella-dev-eastus2"
+      + resource_guid           = (known after apply)
+      + sku_name                = "Standard"
+      + tags                    = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.vnet_secondary.azurerm_nat_gateway_public_ip_association.this[0] will be created
+  + resource "azurerm_nat_gateway_public_ip_association" "this" {
+      + id                   = (known after apply)
+      + nat_gateway_id       = (known after apply)
+      + public_ip_address_id = (known after apply)
+    }
+
+  # module.vnet_secondary.azurerm_network_security_group.private will be created
+  + resource "azurerm_network_security_group" "private" {
+      + id                  = (known after apply)
+      + location            = "eastus2"
+      + name                = "vnet-secondary-opella-dev-eastus2-nsg-private"
+      + resource_group_name = "rg-opella-dev-eastus2"
+      + security_rule       = [
+          + {
+              + access                                     = "Allow"
+              + destination_address_prefix                 = "VirtualNetwork"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "*"
+              + destination_port_ranges                    = []
+              + direction                                  = "Inbound"
+              + name                                       = "Allow-VNet-Inbound"
+              + priority                                   = 100
+              + protocol                                   = "*"
+              + source_address_prefix                      = "VirtualNetwork"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+          + {
+              + access                                     = "Deny"
+              + destination_address_prefix                 = "*"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "*"
+              + destination_port_ranges                    = []
+              + direction                                  = "Inbound"
+              + name                                       = "Deny-All-Inbound"
+              + priority                                   = 4096
+              + protocol                                   = "*"
+              + source_address_prefix                      = "*"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+        ]
+      + tags                = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.vnet_secondary.azurerm_network_security_group.public will be created
+  + resource "azurerm_network_security_group" "public" {
+      + id                  = (known after apply)
+      + location            = "eastus2"
+      + name                = "vnet-secondary-opella-dev-eastus2-nsg-public"
+      + resource_group_name = "rg-opella-dev-eastus2"
+      + security_rule       = [
+          + {
+              + access                                     = "Allow"
+              + destination_address_prefix                 = "*"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "443"
+              + destination_port_ranges                    = []
+              + direction                                  = "Inbound"
+              + name                                       = "Allow-HTTPS-Inbound"
+              + priority                                   = 110
+              + protocol                                   = "Tcp"
+              + source_address_prefix                      = "*"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+          + {
+              + access                                     = "Allow"
+              + destination_address_prefix                 = "*"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "80"
+              + destination_port_ranges                    = []
+              + direction                                  = "Inbound"
+              + name                                       = "Allow-HTTP-Inbound"
+              + priority                                   = 100
+              + protocol                                   = "Tcp"
+              + source_address_prefix                      = "*"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+          + {
+              + access                                     = "Deny"
+              + destination_address_prefix                 = "*"
+              + destination_address_prefixes               = []
+              + destination_application_security_group_ids = []
+              + destination_port_range                     = "*"
+              + destination_port_ranges                    = []
+              + direction                                  = "Inbound"
+              + name                                       = "Deny-All-Inbound"
+              + priority                                   = 4096
+              + protocol                                   = "*"
+              + source_address_prefix                      = "*"
+              + source_address_prefixes                    = []
+              + source_application_security_group_ids      = []
+              + source_port_range                          = "*"
+              + source_port_ranges                         = []
+                # (1 unchanged attribute hidden)
+            },
+        ]
+      + tags                = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.vnet_secondary.azurerm_public_ip.nat[0] will be created
+  + resource "azurerm_public_ip" "nat" {
+      + allocation_method       = "Static"
+      + ddos_protection_mode    = "VirtualNetworkInherited"
+      + fqdn                    = (known after apply)
+      + id                      = (known after apply)
+      + idle_timeout_in_minutes = 4
+      + ip_address              = (known after apply)
+      + ip_version              = "IPv4"
+      + location                = "eastus2"
+      + name                    = "vnet-secondary-opella-dev-eastus2-nat-pip"
+      + resource_group_name     = "rg-opella-dev-eastus2"
+      + sku                     = "Standard"
+      + sku_tier                = "Regional"
+      + tags                    = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.vnet_secondary.azurerm_route_table.private[0] will be created
+  + resource "azurerm_route_table" "private" {
+      + bgp_route_propagation_enabled = false
+      + id                            = (known after apply)
+      + location                      = "eastus2"
+      + name                          = "vnet-secondary-opella-dev-eastus2-rt-private"
+      + resource_group_name           = "rg-opella-dev-eastus2"
+      + route                         = (known after apply)
+      + subnets                       = (known after apply)
+      + tags                          = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.vnet_secondary.azurerm_route_table.public[0] will be created
+  + resource "azurerm_route_table" "public" {
+      + bgp_route_propagation_enabled = true
+      + id                            = (known after apply)
+      + location                      = "eastus2"
+      + name                          = "vnet-secondary-opella-dev-eastus2-rt-public"
+      + resource_group_name           = "rg-opella-dev-eastus2"
+      + route                         = (known after apply)
+      + subnets                       = (known after apply)
+      + tags                          = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+  # module.vnet_secondary.azurerm_subnet.this["snet-private-1"] will be created
+  + resource "azurerm_subnet" "this" {
+      + address_prefixes                              = [
+          + "10.255.1.0/24",
+        ]
+      + default_outbound_access_enabled               = true
+      + id                                            = (known after apply)
+      + name                                          = "snet-private-1"
+      + private_endpoint_network_policies             = "Disabled"
+      + private_link_service_network_policies_enabled = true
+      + resource_group_name                           = "rg-opella-dev-eastus2"
+      + virtual_network_name                          = "vnet-secondary-opella-dev-eastus2"
+    }
+
+  # module.vnet_secondary.azurerm_subnet.this["snet-private-2"] will be created
+  + resource "azurerm_subnet" "this" {
+      + address_prefixes                              = [
+          + "10.255.2.0/24",
+        ]
+      + default_outbound_access_enabled               = true
+      + id                                            = (known after apply)
+      + name                                          = "snet-private-2"
+      + private_endpoint_network_policies             = "Disabled"
+      + private_link_service_network_policies_enabled = true
+      + resource_group_name                           = "rg-opella-dev-eastus2"
+      + virtual_network_name                          = "vnet-secondary-opella-dev-eastus2"
+    }
+
+  # module.vnet_secondary.azurerm_subnet.this["snet-private-3"] will be created
+  + resource "azurerm_subnet" "this" {
+      + address_prefixes                              = [
+          + "10.255.3.0/24",
+        ]
+      + default_outbound_access_enabled               = true
+      + id                                            = (known after apply)
+      + name                                          = "snet-private-3"
+      + private_endpoint_network_policies             = "Disabled"
+      + private_link_service_network_policies_enabled = true
+      + resource_group_name                           = "rg-opella-dev-eastus2"
+      + virtual_network_name                          = "vnet-secondary-opella-dev-eastus2"
+    }
+
+  # module.vnet_secondary.azurerm_subnet_nat_gateway_association.private["snet-private-1"] will be created
+  + resource "azurerm_subnet_nat_gateway_association" "private" {
+      + id             = (known after apply)
+      + nat_gateway_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_secondary.azurerm_subnet_nat_gateway_association.private["snet-private-2"] will be created
+  + resource "azurerm_subnet_nat_gateway_association" "private" {
+      + id             = (known after apply)
+      + nat_gateway_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_secondary.azurerm_subnet_nat_gateway_association.private["snet-private-3"] will be created
+  + resource "azurerm_subnet_nat_gateway_association" "private" {
+      + id             = (known after apply)
+      + nat_gateway_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_secondary.azurerm_subnet_network_security_group_association.private["snet-private-1"] will be created
+  + resource "azurerm_subnet_network_security_group_association" "private" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.vnet_secondary.azurerm_subnet_network_security_group_association.private["snet-private-2"] will be created
+  + resource "azurerm_subnet_network_security_group_association" "private" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.vnet_secondary.azurerm_subnet_network_security_group_association.private["snet-private-3"] will be created
+  + resource "azurerm_subnet_network_security_group_association" "private" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # module.vnet_secondary.azurerm_subnet_route_table_association.private["snet-private-1"] will be created
+  + resource "azurerm_subnet_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_secondary.azurerm_subnet_route_table_association.private["snet-private-2"] will be created
+  + resource "azurerm_subnet_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_secondary.azurerm_subnet_route_table_association.private["snet-private-3"] will be created
+  + resource "azurerm_subnet_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vnet_secondary.azurerm_virtual_network.this will be created
+  + resource "azurerm_virtual_network" "this" {
+      + address_space                  = [
+          + "10.255.0.0/16",
+        ]
+      + dns_servers                    = (known after apply)
+      + guid                           = (known after apply)
+      + id                             = (known after apply)
+      + location                       = "eastus2"
+      + name                           = "vnet-secondary-opella-dev-eastus2"
+      + private_endpoint_vnet_policies = "Disabled"
+      + resource_group_name            = "rg-opella-dev-eastus2"
+      + subnet                         = (known after apply)
+      + tags                           = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "project"     = "opella"
+          + "region"      = "eastus2"
+        }
+    }
+
+Plan: 63 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + acr_login_server     = (sensitive value)
+  + bastion_public_ip    = (sensitive value)
+  + keyvault_name        = "kv-opella-dev-eastus2"
+  + keyvault_uri         = (sensitive value)
+  + primary_subnet_ids   = (sensitive value)
+  + primary_vnet_id      = (sensitive value)
+  + resource_group_name  = "rg-opella-dev-eastus2"
+  + secondary_subnet_ids = (sensitive value)
+  + secondary_vnet_id    = (sensitive value)
+  + vm_private_ip        = (sensitive value)
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
+Releasing state lock. This may take a few moments...
