@@ -39,6 +39,9 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
+      - name: Use example tfvars
+        run: cp terraform.tfvars.example terraform.tfvars
+
       - name: Terraform fmt
         id: fmt
         run: terraform fmt -check -recursive ../..

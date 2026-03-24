@@ -1,5 +1,5 @@
 environment = "prod"
-location    = "eastus"
+location    = "eastus2"
 project     = "opella"
 
 primary_vnet_cidr   = "10.10.0.0/16"
@@ -19,3 +19,7 @@ secondary_subnets = [
   { name = "snet-private-2", address_prefixes = ["10.255.2.0/24"], type = "private" },
   { name = "snet-private-3", address_prefixes = ["10.255.3.0/24"], type = "private" },
 ]
+
+bastion_subnet_prefix = "10.10.200.0/26"
+vm_size               = "Standard_D2s_v3"
+acr_name              = "acropellaprod"

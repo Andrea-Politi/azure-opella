@@ -7,7 +7,7 @@ variable "environment" {
 variable "location" {
   description = "Azure region"
   type        = string
-  default     = "eastus"
+  default     = "eastus2"
 }
 
 variable "project" {
@@ -42,4 +42,26 @@ variable "secondary_subnets" {
     address_prefixes = list(string)
     type             = string
   }))
+}
+
+variable "bastion_subnet_prefix" {
+  description = "Address prefix for the AzureBastionSubnet (minimum /26)"
+  type        = string
+}
+
+variable "vm_size" {
+  description = "Size of the prod VM"
+  type        = string
+  default     = "Standard_D2s_v3"
+}
+
+variable "vm_zone" {
+  description = "Availability zone for the VM"
+  type        = string
+  default     = null
+}
+
+variable "acr_name" {
+  description = "Globally unique name for the container registry (alphanumeric only)"
+  type        = string
 }
